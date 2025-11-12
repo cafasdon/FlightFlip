@@ -5,6 +5,7 @@ import Header from './components/Header'
 import PriceExplorer from './components/PriceExplorer'
 import PromotionsBoard from './components/PromotionsBoard'
 import SearchForm from './components/SearchForm'
+import Settings from './components/Settings'
 import { useAutoRefresh } from './hooks/useAutoRefresh'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
 
   const [activeTab, setActiveTab] = useState('flights') // 'flights', 'promotions', 'explorer'
   const [refreshCount, setRefreshCount] = useState(0)
+  const [showSettings, setShowSettings] = useState(false)
 
   // Auto-refresh every 10 minutes (600 seconds)
   const handleAutoRefresh = useCallback(() => {
@@ -26,7 +28,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-flipboard-dark">
-      <Header />
+      <Header onSettingsClick={() => setShowSettings(true)} />
+      <Settings isOpen={showSettings} onClose={() => setShowSettings(false)} />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Search Form */}
