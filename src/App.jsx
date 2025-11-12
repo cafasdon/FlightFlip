@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import './App.css'
 import FlightBoard from './components/FlightBoard'
 import Header from './components/Header'
+import PriceExplorer from './components/PriceExplorer'
 import PromotionsBoard from './components/PromotionsBoard'
 import SearchForm from './components/SearchForm'
+import { useAutoRefresh } from './hooks/useAutoRefresh'
 
 function App() {
   const [searchParams, setSearchParams] = useState({
@@ -13,6 +15,14 @@ function App() {
   })
 
   const [activeTab, setActiveTab] = useState('flights') // 'flights', 'promotions', 'explorer'
+  const [refreshCount, setRefreshCount] = useState(0)
+
+  // Auto-refresh every 10 minutes (600 seconds)
+  const handleAutoRefresh = useCallback(() => {
+    setRefreshCount((prev) => prev + 1)
+  }, [])
+
+  useAutoRefresh(handleAutoRefresh, 600)
 
   return (
     <div className="min-h-screen bg-flipboard-dark">
@@ -27,8 +37,8 @@ function App() {
           <button
             onClick={() => setActiveTab('flights')}
             className={`px-6 py-3 font-bold transition-all ${activeTab === 'flights'
-                ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
-                : 'text-flipboard-cream hover:text-flipboard-gold'
+              ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
+              : 'text-flipboard-cream hover:text-flipboard-gold'
               }`}
           >
             ✈️ FLIGHTS
@@ -36,8 +46,8 @@ function App() {
           <button
             onClick={() => setActiveTab('promotions')}
             className={`px-6 py-3 font-bold transition-all ${activeTab === 'promotions'
-                ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
-                : 'text-flipboard-cream hover:text-flipboard-gold'
+              ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
+              : 'text-flipboard-cream hover:text-flipboard-gold'
               }`}
           >
             🎉 PROMOTIONS
@@ -45,8 +55,8 @@ function App() {
           <button
             onClick={() => setActiveTab('explorer')}
             className={`px-6 py-3 font-bold transition-all ${activeTab === 'explorer'
-                ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
-                : 'text-flipboard-cream hover:text-flipboard-gold'
+              ? 'text-flipboard-gold border-b-4 border-flipboard-gold'
+              : 'text-flipboard-cream hover:text-flipboard-gold'
               }`}
           >
             📊 PRICE EXPLORER
@@ -54,13 +64,9 @@ function App() {
         </div>
 
         {/* Content */}
-        {activeTab === 'flights' && <FlightBoard searchParams={searchParams} />}
+        {activeTab === 'flights' && <FlightBoard searchParams={searchParams} key={refreshCount} />}
         {activeTab === 'promotions' && <PromotionsBoard />}
-        {activeTab === 'explorer' && (
-          <div className="text-center py-12">
-            <p className="text-flipboard-cream text-lg">Price Explorer coming soon...</p>
-          </div>
-        )}
+        {activeTab === 'explorer' && <PriceExplorer searchParams={searchParams} />}
       </main>
     </div>
   )
